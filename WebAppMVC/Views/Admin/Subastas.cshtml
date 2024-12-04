@@ -1,0 +1,173 @@
+﻿@using BibliotecaClases.Negocio;
+@{
+    ViewData["Title"] = "Subastas";
+    List<Subasta> subastas = ViewBag.Subastas;
+}
+
+<div class="publications-container">
+    <h1 class="page-title">Administración de Subastas</h1>
+
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["MensajeExito"]
+        </div>
+    }
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["MensajeError"]
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Mejor Oferta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Subasta subasta in subastas)
+                {
+                    <tr>
+                        <td>@subasta.Nombre</td>
+                        <td>@subasta.FechaPublicacion.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="status-badge @subasta.Estado.ToString().ToLower()">
+                                @subasta.Estado
+                            </span>
+                        </td>
+                        <td>
+                            @if (subasta.MejorOferta != null)
+                            {
+                                <span>@subasta.MejorOferta.Cantidad.ToString("C")</span>
+                            }
+                            else
+                            {
+                                <span>Sin ofertas</span>
+                            }
+                        </td>
+                        <td>
+                            @if (subasta.Estado == EstadoPublicación.Abierta)
+                            {
+                                <form method="post" action="@Url.Action("CerrarSubasta", "Admin")" class="action-form">
+                                    <input type="hidden" name="publicacionId" value="@subasta.Id" />
+                                    <button type="submit" class="action-button buy">Cerrar subasta</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Subasta cerrada</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .publications-container {
+        padding: 2rem 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+    }
+
+    .table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .table th {
+        background: #f8fafc;
+        color: #4a5568;
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .table td {
+        padding: 1rem;
+        border-top: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-badge.abierta {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.cerrada {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-badge.cancelada {
+        background: #fff3dc;
+        color: #995c1b;
+    }
+
+    .action-button {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-button.buy {
+        background: #2563eb;
+        color: white;
+    }
+
+    .action-button.buy:hover {
+        background: #1d4ed8;
+    }
+
+    .text-muted {
+        color: #6b7280;
+    }
+
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        
+    }
+</style>

@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebAppMVC</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebAppMVC.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-links">
+                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">Marketplace</a>
+                    @if (Context.Session.GetString("email") != null)
+                    {
+                        <a class="nav-link" href="@Url.Action("Index", "Publicaciones")">Publicaciones</a>
+                    }
+                </div>
+                <div class="nav-user">
+                    @if (Context.Session.GetString("email") != null)
+                    {
+                        <a class="user-name" href="@Url.Action("Index", "Account")">@Context.Session.GetString("nombre")</a>
+                        <form method="post" action="@Url.Action("Logout", "Account")" class="d-inline">
+                            <button type="submit" class="logout-button">Cerrar sesión</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Login", "Account")" class="login-link">Iniciar sesión</a>
+                        <a href="@Url.Action("Register", "Account")" class="register-link">Crear cuenta</a>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <style>
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .navbar-brand {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            color: #4a4a4a;
+            font-weight: 500;
+        }
+
+        .logout-button {
+            background: none;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-button:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .login-link, .register-link {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .login-link {
+            color: #2563eb;
+        }
+
+        .login-link:hover {
+            background: #f0f5ff;
+        }
+
+        .register-link {
+            background: #2563eb;
+            color: white;
+        }
+
+        .register-link:hover {
+            background: #1d4ed8;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #4a4a4a;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #2563eb;
+        }
+    </style>
+</body>
+</html>

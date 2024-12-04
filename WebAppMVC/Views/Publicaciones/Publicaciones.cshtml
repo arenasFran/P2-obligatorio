@@ -1,0 +1,367 @@
+﻿@using BibliotecaClases.Negocio;
+@{
+    ViewData["Title"] = "Publicaciones";
+    List<Publicacion> publicaciones = ViewBag.Publicaciones as List<Publicacion>;
+}
+
+<div class="publications-container">
+    <h1 class="page-title">Publicaciones</h1>
+
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["MensajeExito"]
+        </div>
+    }
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["MensajeError"]
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Precio/ValorOferta</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Publicacion publicacion in publicaciones)
+                {
+                    <tr>
+                        <td>@publicacion.Nombre</td>
+                        <td>@publicacion.FechaPublicacion.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="status-badge @publicacion.Estado.ToString().ToLower()">
+                                @publicacion.Estado
+                            </span>
+                        </td>
+                        <td>
+                            @if (publicacion is Venta venta)
+                            {
+                                @venta.Precio.ToString("C")
+                            }
+                            else if (publicacion is Subasta subasta)
+                            {
+                                if (subasta.MejorOferta != null)
+                                {
+                                    <span>@subasta.MejorOferta.Cantidad.ToString("C")</span>
+                                }
+                                else
+                                {
+                                    <span>Sin ofertas</span>
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (publicacion is Venta)
+                            {
+                                <form method="post" action="@Url.Action("Comprar", "Publicaciones")" class="action-form">
+                                    <input type="hidden" name="publicacionId" value="@publicacion.Id" />
+                                    <button type="submit" class="action-button buy">Comprar</button>
+                                </form>
+                            }
+                            else if (publicacion is Subasta)
+                            {
+                                <button class="action-button bid" 
+                                        onclick="openBidModal(@publicacion.Id, '@publicacion.Nombre', @(((Subasta)publicacion).MejorOferta?.Cantidad ?? 0))">
+                                    Ofertar
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No disponible</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de Oferta -->
+<div id="bidModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Realizar Oferta</h2>
+            <button class="close-button" onclick="closeBidModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="item-info">
+                Artículo: <span id="itemName"></span>
+            </p>
+            <p class="current-price">
+                Precio actual: <span id="currentPrice"></span>
+            </p>
+            <form id="bidForm" method="post" action="@Url.Action("Subastar", "Publicaciones")">
+                <input type="hidden" name="publicacionId" id="publicacionId" />
+                <div class="form-group">
+                    <label for="cantidadOferta">Tu oferta</label>
+                    <div class="input-group">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" 
+                               step="0.01" 
+                               name="cantidadOferta" 
+                               class="form-input" 
+                               id="cantidadOferta" 
+                               required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="action-button secondary" onclick="closeBidModal()">Cancelar</button>
+                    <button type="submit" class="action-button bid">Ofertar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .publications-container {
+        padding: 2rem 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+    }
+
+    .table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .table th {
+        background: #f8fafc;
+        color: #4a5568;
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .table td {
+        padding: 1rem;
+        border-top: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-badge.activa {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.abierta {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.cerrada {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-badge.cancelada {
+        background: #fff3dc;
+        color: #995c1b;
+    }
+
+    .action-button {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-button.buy {
+        background: #2563eb;
+        color: white;
+    }
+
+    .action-button.buy:hover {
+        background: #1d4ed8;
+    }
+
+    .action-button.bid {
+        background: #2563eb;
+        color: white;
+    }
+
+    .action-button.bid:hover {
+        background: #1d4ed8;
+    }
+
+    .action-button.secondary {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .action-button.secondary:hover {
+        background: #d1d5db;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: relative;
+        background: white;
+        margin: 10% auto;
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #1a1a1a;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #6b7280;
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .item-info, .current-price {
+        margin-bottom: 1rem;
+        color: #4b5563;
+    }
+
+    .item-info span, .current-price span {
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+
+    .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        transition: border-color 0.2s ease;
+        margin-top: 0.5rem;
+    }
+
+    .input-group:focus-within {
+        border-color: #2563eb;
+    }
+
+    .currency-symbol {
+        padding-left: 1rem;
+        color: #666;
+        font-weight: 500;
+        position: absolute;
+        left: 0;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: #2a2a2a;
+        background: transparent;
+    }
+
+    .form-input:focus {
+        outline: none;
+    }
+
+    .modal-footer {
+        padding: 1.5rem 0 0;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+</style>
+
+<script>
+    console.log('hi');
+    function openBidModal(publicacionId, nombre, cantidad) {
+        document.getElementById('bidModal').style.display = 'block';
+        document.getElementById('publicacionId').value = publicacionId;
+        document.getElementById('itemName').textContent = nombre;
+        document.getElementById('currentPrice').textContent = 
+            new Intl.NumberFormat('es-UY', { style: 'currency', currency: 'UYU' }).format(cantidad);
+        document.getElementById('cantidadOferta').min = cantidad + 1;
+        document.getElementById('cantidadOferta').placeholder = 
+            `Mínimo ${new Intl.NumberFormat('es-UY', { style: 'currency', currency: 'UYU' }).format(cantidad + 1)}`;
+    }
+
+    function closeBidModal() {
+        document.getElementById('bidModal').style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic fuera de él
+    window.onclick = function(event) {
+        const modal = document.getElementById('bidModal');
+        if (event.target == modal) {
+            closeBidModal();
+        }
+    }
+</script>

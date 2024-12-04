@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "Crear Cuenta";
+}
+
+<div class="login-container">
+    <h1 class="login-title">Crear Cuenta</h1>
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["MensajeError"]
+        </div>
+    }
+    <div class="login-card">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="firstName">Nombre</label>
+                        <input type="text" class="form-input" id="firstName" name="FirstName" placeholder="Ingresa tu nombre" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="lastName">Apellido</label>
+                        <input type="text" class="form-input" id="lastName" name="LastName" placeholder="Ingresa tu apellido" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" class="form-input" id="email" name="Email" placeholder="Ingresa tu correo electrónico" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" 
+                       class="form-input" 
+                       id="password" 
+                       name="Password" 
+                       placeholder="Crea tu contraseña" 
+                       pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                       title="La contraseña debe tener al menos 8 caracteres y contener letras y números"
+                       required>
+                <small class="password-hint">La contraseña debe tener al menos 8 caracteres y contener letras y números</small>
+            </div>
+
+            <button type="submit" class="login-button">Crear cuenta</button>
+        </form>
+        <div class="signup-prompt">
+            <span>¿Ya tienes una cuenta?</span>
+            <a href="/Account/Login" class="signup-link">Iniciar sesión</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 60px auto;
+        padding: 10px 20px;
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .login-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+
+    .login-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a4a4a;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: #2a2a2a;
+        transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #666666;
+    }
+
+    .form-input::placeholder {
+        color: #9e9e9e;
+    }
+
+    .password-hint {
+        display: block;
+        margin-top: 0.5rem;
+        color: #666666;
+        font-size: 0.8rem;
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 0.875rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .login-button:hover {
+        background: #1d4ed8;
+    }
+
+    .signup-prompt {
+        margin-top: 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .signup-prompt span {
+        color: #666666;
+    }
+
+    .signup-link {
+        color: #2563eb;
+        text-decoration: none;
+        margin-left: 0.5rem;
+        font-weight: 500;
+    }
+
+    .signup-link:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .row {
+        display: flex;
+        margin: 0 -0.5rem;
+    }
+
+    .col-md-6 {
+        flex: 0 0 50%;
+        padding: 0 0.5rem;
+    }
+</style> 
